@@ -5,6 +5,7 @@ const {
   Product,
   User,
 } = require('../models');
+const { getDeliveryRoute } = require('../services/deliveryRouteService');
 
 // =========================
 // TẠO ĐƠN HÀNG
@@ -325,6 +326,58 @@ const getMyOrderById = async (req, res) => {
   }
 };
 
+const getMyOrderRoute = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const orderId = Number(req.params.id);
+
+    if (!Number.isInteger(orderId) || orderId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID đơn hàng không hợp lệ',
+      });
+    }
+
+    const order = await Order.findOne({
+      where: {
+        id: orderId,
+        user_id: userId,
+      },
+      attributes: ['id', 'status', 'shipping_address'],
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy đơn hàng',
+      });
+    }
+
+    if (order.status !== 'shipping') {
+      return res.status(409).json({
+        success: false,
+        message: 'Đơn hàng chưa ở trạng thái đang giao',
+      });
+    }
+
+    const route = await getDeliveryRoute(order.shipping_address);
+
+    return res.status(200).json({
+      success: true,
+      data: route,
+    });
+  } catch (error) {
+    console.error('Get delivery route error:', error);
+
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.statusCode
+        ? error.message
+        : 'Không thể tính tuyến đường giao hàng',
+    });
+  }
+};
+
 // =========================
 // ADMIN - LẤY TẤT CẢ ĐƠN HÀNG
 // =========================
@@ -472,6 +525,12 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
+    if (status === 'shipping' && order.status !== 'shipping') {
+      order.shipper_latitude = null;
+      order.shipper_longitude = null;
+      order.shipper_location_updated_at = null;
+    }
+
     order.status = status;
 
     await order.save();
@@ -491,11 +550,85 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+const updateShipperLocation = async (req, res) => {
+  try {
+    const orderId = Number(req.params.id);
+
+    if (!Number.isInteger(orderId) || orderId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID đơn hàng không hợp lệ',
+      });
+    }
+
+    const { latitude, longitude } = req.body || {};
+    const parsedLatitude = Number(latitude);
+    const parsedLongitude = Number(longitude);
+
+    if (
+      typeof latitude !== 'number' ||
+      typeof longitude !== 'number' ||
+      !Number.isFinite(parsedLatitude) ||
+      !Number.isFinite(parsedLongitude) ||
+      parsedLatitude < -90 ||
+      parsedLatitude > 90 ||
+      parsedLongitude < -180 ||
+      parsedLongitude > 180
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tọa độ shipper không hợp lệ',
+      });
+    }
+
+    const order = await Order.findByPk(orderId);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy đơn hàng',
+      });
+    }
+
+    if (order.status !== 'shipping') {
+      return res.status(409).json({
+        success: false,
+        message: 'Chỉ có thể cập nhật vị trí khi đơn hàng đang giao',
+      });
+    }
+
+    order.shipper_latitude = parsedLatitude;
+    order.shipper_longitude = parsedLongitude;
+    order.shipper_location_updated_at = new Date();
+
+    await order.save();
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        id: order.id,
+        shipper_latitude: order.shipper_latitude,
+        shipper_longitude: order.shipper_longitude,
+        shipper_location_updated_at: order.shipper_location_updated_at,
+      },
+    });
+  } catch (error) {
+    console.error('Update shipper location error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Không thể cập nhật vị trí shipper',
+    });
+  }
+};
+
 module.exports = {
   createOrder,
   getMyOrders,
   getMyOrderById,
+  getMyOrderRoute,
   getAllOrders,
   getAdminOrderById,
   updateOrderStatus,
+  updateShipperLocation,
 };

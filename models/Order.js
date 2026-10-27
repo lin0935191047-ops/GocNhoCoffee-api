@@ -42,6 +42,21 @@ const Order = sequelize.define(
       allowNull: false,
     },
 
+    shipper_latitude: {
+      type: DataTypes.DECIMAL(10, 7),
+      allowNull: true,
+    },
+
+    shipper_longitude: {
+      type: DataTypes.DECIMAL(10, 7),
+      allowNull: true,
+    },
+
+    shipper_location_updated_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+
     note: {
       type: DataTypes.TEXT,
       allowNull: true,

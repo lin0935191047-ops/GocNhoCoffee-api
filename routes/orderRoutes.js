@@ -6,9 +6,11 @@ const {
   createOrder,
   getMyOrders,
   getMyOrderById,
+  getMyOrderRoute,
   getAllOrders,
   getAdminOrderById,
   updateOrderStatus,
+  updateShipperLocation,
 } = require('../controllers/orderController');
 
 const authMiddleware = require('../middleware/authMiddleware');
@@ -39,6 +41,13 @@ router.put(
   updateOrderStatus,
 );
 
+router.put(
+  '/admin/:id/location',
+  authMiddleware,
+  adminOnly,
+  updateShipperLocation,
+);
+
 // ==================================================
 // USER
 // ==================================================
@@ -53,6 +62,12 @@ router.get(
   '/',
   authMiddleware,
   getMyOrders,
+);
+
+router.get(
+  '/:id/route',
+  authMiddleware,
+  getMyOrderRoute,
 );
 
 router.get(
