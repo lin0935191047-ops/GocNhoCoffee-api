@@ -23,13 +23,11 @@ const pickProductFields = (body = {}) =>
     ]),
   );
 
-// ==========================================
-// GET /api/products
+//  GET /api/products
 // Lấy danh sách sản phẩm
 // + tìm kiếm
 // + lọc category
 // + phân trang
-// ==========================================
 const getProducts = async (req, res) => {
   try {
     const { search = '', category, page = 1, limit = 8 } = req.query;
@@ -41,18 +39,14 @@ const getProducts = async (req, res) => {
 
     const whereCondition = {};
 
-    // ==============================
     // Tìm kiếm theo tên sản phẩm
-    // ==============================
     if (search.trim()) {
       whereCondition.name = {
         [Op.iLike]: `%${search.trim()}%`,
       };
     }
 
-    // ==============================
-    // Lọc theo category
-    // ==============================
+    //  Lọc theo category
     if (category) {
       const categoryId = Number(category);
 
@@ -66,9 +60,7 @@ const getProducts = async (req, res) => {
       whereCondition.category_id = categoryId;
     }
 
-    // ==============================
     // Lấy dữ liệu
-    // ==============================
     const { count, rows } = await Product.findAndCountAll({
       where: whereCondition,
 
@@ -109,10 +101,8 @@ const getProducts = async (req, res) => {
   }
 };
 
-// ==========================================
 // GET /api/products/:id
 // Chi tiết sản phẩm
-// ==========================================
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -147,17 +137,13 @@ const getProductById = async (req, res) => {
   }
 };
 
-// ==========================================
 // POST /api/products
 // Tạo sản phẩm
-// ==========================================
 const createProduct = async (req, res) => {
   try {
     const productData = pickProductFields(req.body);
 
-    // ==============================
     // Kiểm tra category
-    // ==============================
     if (!productData.category_id) {
       return res.status(400).json({
         success: false,
@@ -174,9 +160,7 @@ const createProduct = async (req, res) => {
       });
     }
 
-    // ==============================
     // Kiểm tra slug trùng
-    // ==============================
     if (productData.slug) {
       const existingProduct = await Product.findOne({
         where: {
@@ -192,12 +176,10 @@ const createProduct = async (req, res) => {
       }
     }
 
-    // ==============================
     // Tạo sản phẩm
     // Sequelize tự tạo:
     // created_at
     // updated_at
-    // ==============================
     const product = await Product.create(productData);
 
     return res.status(201).json({
@@ -216,10 +198,8 @@ const createProduct = async (req, res) => {
   }
 };
 
-// ==========================================
 // PUT /api/products/:id
 // Cập nhật sản phẩm
-// ==========================================
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -235,9 +215,7 @@ const updateProduct = async (req, res) => {
 
     const productData = pickProductFields(req.body);
 
-    // ==============================
     // Nếu cập nhật category
-    // ==============================
     if (productData.category_id !== undefined) {
       const category = await Category.findByPk(productData.category_id);
 
@@ -249,9 +227,7 @@ const updateProduct = async (req, res) => {
       }
     }
 
-    // ==============================
     // Nếu cập nhật slug
-    // ==============================
     if (productData.slug !== undefined) {
       const existingProduct = await Product.findOne({
         where: {
@@ -272,11 +248,9 @@ const updateProduct = async (req, res) => {
       }
     }
 
-    // ==============================
     // Update
     // Sequelize tự cập nhật:
     // updated_at
-    // ==============================
     await product.update(productData);
 
     // Lấy lại product kèm Category
@@ -305,10 +279,8 @@ const updateProduct = async (req, res) => {
   }
 };
 
-// ==========================================
 // DELETE /api/products/:id
 // Xóa sản phẩm
-// ==========================================
 const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
