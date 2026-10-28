@@ -1,10 +1,8 @@
 const { Op } = require('sequelize');
 const { Category } = require('../models');
 
-// ==========================================
 // GET /api/categories
 // Lấy tất cả danh mục
-// ==========================================
 const getCategories = async (req, res) => {
   try {
     const categories = await Category.findAll({
@@ -25,10 +23,8 @@ const getCategories = async (req, res) => {
   }
 };
 
-// ==========================================
 // GET /api/categories/:id
 // Chi tiết danh mục
-// ==========================================
 const getCategoryById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -56,11 +52,9 @@ const getCategoryById = async (req, res) => {
   }
 };
 
-// ==========================================
 // POST /api/categories
 // Tạo danh mục
 // Chỉ Admin
-// ==========================================
 const createCategory = async (req, res) => {
   try {
     const { name, slug, description, image } = req.body;
@@ -125,11 +119,9 @@ const createCategory = async (req, res) => {
   }
 };
 
-// ==========================================
 // PUT /api/categories/:id
 // Cập nhật danh mục
 // Chỉ Admin
-// ==========================================
 const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
@@ -145,9 +137,7 @@ const updateCategory = async (req, res) => {
 
     const { name, slug, description, image } = req.body;
 
-    // ==============================
     // Kiểm tra name trùng
-    // ==============================
     if (name !== undefined) {
       const existingName = await Category.findOne({
         where: {
@@ -165,10 +155,7 @@ const updateCategory = async (req, res) => {
         });
       }
     }
-
-    // ==============================
     // Kiểm tra slug trùng
-    // ==============================
     if (slug !== undefined) {
       const existingSlug = await Category.findOne({
         where: {
@@ -187,9 +174,7 @@ const updateCategory = async (req, res) => {
       }
     }
 
-    // ==============================
     // Update
-    // ==============================
     await category.update({
       ...(name !== undefined && {
         name: name.trim(),
@@ -224,11 +209,9 @@ const updateCategory = async (req, res) => {
   }
 };
 
-// ==========================================
 // DELETE /api/categories/:id
 // Xóa danh mục
 // Chỉ Admin
-// ==========================================
 const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
