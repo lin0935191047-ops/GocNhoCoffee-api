@@ -16,9 +16,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ==========================
 // ROUTES
-// ==========================
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/auth', authRoutes);
@@ -26,18 +24,14 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/addresses', addressRoutes);
 
-// ==========================
 // HOME
-// ==========================
 app.get('/', (req, res) => {
   res.json({
     message: 'GocNhoCoffee API is running!',
   });
 });
 
-// ==========================
 // HEALTH CHECK
-// ==========================
 app.get('/health', (req, res) => {
   res.json({
     success: true,
@@ -45,9 +39,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-// ==========================
 // SERVER
-// ==========================
 const PORT = Number(process.env.PORT || 3000);
 
 async function startServer() {
