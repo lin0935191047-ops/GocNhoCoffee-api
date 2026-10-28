@@ -3,9 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const { User } = require('../models');
 
-// ==========================
-// REGISTER
-// ==========================
+//  REGISTER
 const register = async (req, res) => {
   try {
     const { name, email, password, phone, address } = req.body;
@@ -67,9 +65,7 @@ const register = async (req, res) => {
   }
 };
 
-// ==========================
 // LOGIN
-// ==========================
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -144,10 +140,8 @@ const login = async (req, res) => {
   }
 };
 
-// ==========================================
 // GET /api/auth/me
 // Lấy thông tin user đang đăng nhập
-// ==========================================
 const getMe = async (req, res) => {
   try {
     const { User } = require('../models');
