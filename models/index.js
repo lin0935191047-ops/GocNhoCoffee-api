@@ -9,9 +9,7 @@ const Review = require('./Review');
 const ContactMessage = require('./ContactMessage');
 const Address = require('./Address');
 
-// =========================
 // CATEGORY - PRODUCT
-// =========================
 Category.hasMany(Product, {
   foreignKey: 'category_id',
 });
@@ -20,9 +18,7 @@ Product.belongsTo(Category, {
   foreignKey: 'category_id',
 });
 
-// =========================
 // USER - ORDER
-// =========================
 User.hasMany(Order, {
   foreignKey: 'user_id',
 });
@@ -40,9 +36,7 @@ Order.belongsTo(User, {
   foreignKey: 'user_id',
 });
 
-// =========================
 // ORDER - ORDER ITEM
-// =========================
 Order.hasMany(OrderItem, {
   foreignKey: 'order_id',
   as: 'items',
@@ -53,9 +47,7 @@ OrderItem.belongsTo(Order, {
   foreignKey: 'order_id',
 });
 
-// =========================
 // PRODUCT - ORDER ITEM
-// =========================
 Product.hasMany(OrderItem, {
   foreignKey: 'product_id',
 });
