@@ -56,6 +56,26 @@ OrderItem.belongsTo(Product, {
   foreignKey: 'product_id',
 });
 
+// USER - REVIEW
+User.hasMany(Review, {
+  foreignKey: 'user_id',
+  onDelete: 'CASCADE',
+});
+
+Review.belongsTo(User, {
+  foreignKey: 'user_id',
+});
+
+// PRODUCT - REVIEW
+Product.hasMany(Review, {
+  foreignKey: 'product_id',
+  onDelete: 'CASCADE',
+});
+
+Review.belongsTo(Product, {
+  foreignKey: 'product_id',
+});
+
 module.exports = {
   sequelize,
   User,
